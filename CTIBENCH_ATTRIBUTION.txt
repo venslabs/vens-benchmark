@@ -1,0 +1,3 @@
+CTIBench (cti-vsp) — https://github.com/xashru/cti-bench
+License: CC BY-NC-SA 4.0 (NonCommercial). Conference/research use with attribution.
+Derived from NVD (public domain).

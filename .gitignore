@@ -1,0 +1,20 @@
+# CTIBench data is CC BY-NC-SA (NonCommercial) — do NOT redistribute; download at runtime.
+data/cti-vsp.tsv
+data/cti-*.tsv
+
+# secrets — never commit API keys
+*.key
+.env
+.env.*
+secrets/
+
+# run outputs / results
+results/
+runs/
+*.attestation.cdx.json
+out*.json
+
+# python
+__pycache__/
+*.pyc
+.venv/
