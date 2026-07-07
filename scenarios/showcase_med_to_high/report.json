@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2023-45857",
+          "PkgName": "axios",
+          "InstalledVersion": "1.5.1",
+          "Severity": "MEDIUM",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/axios@1.5.1"
+          },
+          "Title": "Axios XSRF-TOKEN disclosure",
+          "Description": "An issue discovered in Axios 1.5.1 inadvertently reveals the confidential XSRF-TOKEN stored in cookies by including it in the HTTP header X-XSRF-TOKEN for every request made to any host allowing attackers to view sensitive information. CVSS 6.5 (MEDIUM).",
+          "PrimaryURL": "https://example.test/CVE-2023-45857"
+        }
+      ]
+    }
+  ]
+}

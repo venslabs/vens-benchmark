@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0008",
+          "PkgName": "regexval",
+          "InstalledVersion": "1.0.0",
+          "Severity": "HIGH",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/regexval@1.0.0"
+          },
+          "Title": "ReDoS in regexval",
+          "Description": "A catastrophic-backtracking regular expression in regexval lets a remote user hang the request thread with crafted input, exhausting CPU (denial of service). No data is read or modified. CVSS 7.5.",
+          "PrimaryURL": "https://example.test/CVE-2099-0008"
+        }
+      ]
+    }
+  ]
+}

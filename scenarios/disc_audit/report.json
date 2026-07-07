@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0006",
+          "PkgName": "auditlog",
+          "InstalledVersion": "2.3.0",
+          "Severity": "MEDIUM",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/auditlog@2.3.0"
+          },
+          "Title": "Audit-trail forgery in auditlog",
+          "Description": "An authenticated user can inject or suppress entries in the audit trail, breaking accountability and forensic integrity. There is no confidentiality or availability impact. CVSS 5.4.",
+          "PrimaryURL": "https://example.test/CVE-2099-0006"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "showcase_high_to_low": {
+    "cve": "CVE-2021-44228",
+    "sev": "CRITICAL",
+    "expect": "final risk LOW despite CVSS 10.0 (Log4Shell unreachable + low-value context)"
+  },
+  "showcase_med_to_high": {
+    "cve": "CVE-2023-45857",
+    "sev": "MEDIUM",
+    "expect": "final risk HIGH despite CVSS 6.5 (PII + GDPR + internet)"
+  },
+  "expo_internal": {
+    "cve": "CVE-2099-0001",
+    "sev": "CRITICAL",
+    "expect": "baseline of exposure family"
+  },
+  "expo_private": {
+    "cve": "CVE-2099-0001",
+    "sev": "CRITICAL",
+    "expect": "ThreatAgent/final >= internal"
+  },
+  "expo_internet": {
+    "cve": "CVE-2099-0001",
+    "sev": "CRITICAL",
+    "expect": "ThreatAgent/final >= private"
+  },
+  "ctrl_off": {
+    "cve": "CVE-2099-0001",
+    "sev": "CRITICAL",
+    "expect": "baseline, no controls"
+  },
+  "ctrl_on": {
+    "cve": "CVE-2099-0001",
+    "sev": "CRITICAL",
+    "expect": "Vulnerability/final <= ctrl_off"
+  },
+  "wrong_yaml": {
+    "cve": "CVE-2099-0004",
+    "sev": "CRITICAL",
+    "expect": "reveals blind-follow vs flag; not a pass/fail direction"
+  },
+  "floor": {
+    "cve": "CVE-2099-0003",
+    "sev": "LOW",
+    "expect": "final risk LOW"
+  },
+  "sens_low": {
+    "cve": "CVE-2099-0002",
+    "sev": "MEDIUM",
+    "expect": "technical_impact + final: low end of sensitivity ladder"
+  },
+  "sens_high": {
+    "cve": "CVE-2099-0002",
+    "sev": "MEDIUM",
+    "expect": "technical_impact/final >= sens_low"
+  },
+  "sens_critical": {
+    "cve": "CVE-2099-0002",
+    "sev": "MEDIUM",
+    "expect": "technical_impact/final >= sens_high"
+  },
+  "crit_low": {
+    "cve": "CVE-2099-0001",
+    "sev": "CRITICAL",
+    "expect": "business_impact + final: low end"
+  },
+  "crit_critical": {
+    "cve": "CVE-2099-0001",
+    "sev": "CRITICAL",
+    "expect": "business_impact/final >= crit_low"
+  },
+  "comp_none": {
+    "cve": "CVE-2099-0002",
+    "sev": "MEDIUM",
+    "expect": "business_impact baseline"
+  },
+  "comp_gdpr": {
+    "cve": "CVE-2099-0002",
+    "sev": "MEDIUM",
+    "expect": "business_impact/final >= comp_none"
+  },
+  "disc_dos": {
+    "cve": "CVE-2099-0005",
+    "sev": "HIGH",
+    "expect": "DoS-only: a model should not max technical via data_sensitivity"
+  },
+  "disc_audit": {
+    "cve": "CVE-2099-0006",
+    "sev": "MEDIUM",
+    "expect": "accountability CVE: technical should track audit_requirement, not low data"
+  },
+  "disc_ctrl_irrelevant": {
+    "cve": "CVE-2099-0007",
+    "sev": "HIGH",
+    "expect": "WAF is irrelevant to a local-file exploit: vulnerability should not drop"
+  },
+  "reach_yes": {
+    "cve": "CVE-2099-0001",
+    "sev": "CRITICAL",
+    "expect": "reachable: final HIGH"
+  },
+  "reach_no": {
+    "cve": "CVE-2099-0001",
+    "sev": "CRITICAL",
+    "expect": "unreachable: final < reach_yes"
+  },
+  "disc_dos2": {
+    "cve": "CVE-2099-0008",
+    "sev": "HIGH",
+    "expect": "DoS-only: technical should not max via data_sensitivity"
+  },
+  "disc_dos3": {
+    "cve": "CVE-2099-0009",
+    "sev": "HIGH",
+    "expect": "DoS-only: technical should not max via data_sensitivity"
+  },
+  "disc_audit2": {
+    "cve": "CVE-2099-0010",
+    "sev": "MEDIUM",
+    "expect": "accountability: technical should track audit_requirement"
+  },
+  "disc_audit3": {
+    "cve": "CVE-2099-0011",
+    "sev": "MEDIUM",
+    "expect": "accountability: technical should track audit_requirement"
+  },
+  "reach2_yes": {
+    "cve": "CVE-2099-0012",
+    "sev": "CRITICAL",
+    "expect": "reachable: final HIGH"
+  },
+  "reach2_no": {
+    "cve": "CVE-2099-0012",
+    "sev": "CRITICAL",
+    "expect": "unreachable: final < reach2_yes"
+  },
+  "reach3_yes": {
+    "cve": "CVE-2099-0013",
+    "sev": "CRITICAL",
+    "expect": "reachable: final HIGH"
+  },
+  "reach3_no": {
+    "cve": "CVE-2099-0013",
+    "sev": "CRITICAL",
+    "expect": "unreachable: final < reach3_yes"
+  },
+  "disc_ctrl_off_local": {
+    "cve": "CVE-2099-0007",
+    "sev": "HIGH",
+    "expect": "local bug, no controls: vulnerability baseline for the WAF test"
+  }
+}

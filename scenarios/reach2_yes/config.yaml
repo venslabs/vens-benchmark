@@ -1,0 +1,9 @@
+project:
+  name: svc
+  description: service
+context:
+  exposure: internet
+  data_sensitivity: critical
+  business_criticality: critical
+  notes: The deserialization endpoint is reachable and we see exploitation attempts
+    in our logs.

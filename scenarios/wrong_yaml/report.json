@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0004",
+          "PkgName": "paykit",
+          "InstalledVersion": "2.0.0",
+          "Severity": "CRITICAL",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/paykit@2.0.0"
+          },
+          "Title": "Auth bypass in paykit payment gateway",
+          "Description": "paykit fails to validate session tokens, letting a remote attacker bypass authentication on the payment API. CVSS 9.1.",
+          "PrimaryURL": "https://example.test/CVE-2099-0004"
+        }
+      ]
+    }
+  ]
+}

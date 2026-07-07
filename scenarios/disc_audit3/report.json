@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0011",
+          "PkgName": "syslogx",
+          "InstalledVersion": "3.0.0",
+          "Severity": "MEDIUM",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/syslogx@3.0.0"
+          },
+          "Title": "Audit-log deletion in syslogx",
+          "Description": "syslogx accepts unauthenticated control messages that delete existing audit logs, destroying the forensic trail. This affects the integrity of the audit record only. CVSS 5.4.",
+          "PrimaryURL": "https://example.test/CVE-2099-0011"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+project:
+  name: dev-box
+  description: developer scratch box
+context:
+  exposure: internal
+  data_sensitivity: low
+  business_criticality: low

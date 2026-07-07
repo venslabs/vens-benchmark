@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0009",
+          "PkgName": "zipread",
+          "InstalledVersion": "2.1.0",
+          "Severity": "HIGH",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/zipread@2.1.0"
+          },
+          "Title": "Decompression bomb in zipread",
+          "Description": "zipread does not bound decompression, so a small crafted archive expands to exhaust memory and crash the process (denial of service). The impact is availability only. CVSS 7.5.",
+          "PrimaryURL": "https://example.test/CVE-2099-0009"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0003",
+          "PkgName": "tinylog",
+          "InstalledVersion": "0.9.0",
+          "Severity": "LOW",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/tinylog@0.9.0"
+          },
+          "Title": "Log spoofing via unescaped newline in tinylog",
+          "Description": "tinylog does not escape newlines, letting a local user forge log lines. Requires local access, no data impact. CVSS 3.3.",
+          "PrimaryURL": "https://example.test/CVE-2099-0003"
+        }
+      ]
+    }
+  ]
+}

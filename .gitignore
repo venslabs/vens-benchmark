@@ -18,3 +18,7 @@ out*.json
 __pycache__/
 *.pyc
 .venv/
+
+# compiled vens binary (rebuild from the vens repo) and downloaded reference papers
+vens
+*.pdf

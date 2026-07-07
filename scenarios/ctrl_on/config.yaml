@@ -1,0 +1,12 @@
+project:
+  name: svc
+  description: service
+context:
+  exposure: internet
+  data_sensitivity: high
+  business_criticality: high
+  controls:
+    waf: true
+    ids: true
+    segmentation: true
+  notes: WAF blocks the malicious request pattern; IDS detects exploit.

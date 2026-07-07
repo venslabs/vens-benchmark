@@ -1,0 +1,9 @@
+project:
+  name: svc
+  description: service
+context:
+  exposure: internet
+  data_sensitivity: critical
+  business_criticality: critical
+  notes: Templates are never user-supplied in this build; the injection path is not
+    reachable.

@@ -1,0 +1,12 @@
+project:
+  name: customer-portal
+  description: Public customer portal handling PII (React/axios frontend)
+context:
+  exposure: internet
+  data_sensitivity: critical
+  business_criticality: critical
+  compliance_requirements:
+  - GDPR
+  notes: axios carries authenticated sessions and customer PII (names, emails, national
+    IDs) to first- and third-party APIs. Leaking the XSRF token and sensitive headers
+    enables account takeover and a reportable GDPR breach.

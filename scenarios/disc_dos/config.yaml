@@ -1,0 +1,8 @@
+project:
+  name: svc
+  description: streaming service
+context:
+  exposure: internet
+  data_sensitivity: critical
+  business_criticality: high
+  availability_requirement: high

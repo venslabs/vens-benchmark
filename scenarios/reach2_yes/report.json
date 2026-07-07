@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0012",
+          "PkgName": "pickleio",
+          "InstalledVersion": "1.2.0",
+          "Severity": "CRITICAL",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/pickleio@1.2.0"
+          },
+          "Title": "Deserialization RCE in pickleio",
+          "Description": "pickleio deserializes untrusted input received over the network, allowing a remote attacker to execute arbitrary code. Public PoC exists. CVSS 9.8.",
+          "PrimaryURL": "https://example.test/CVE-2099-0012"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0002",
+          "PkgName": "jsoncfg",
+          "InstalledVersion": "3.4.1",
+          "Severity": "MEDIUM",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/jsoncfg@3.4.1"
+          },
+          "Title": "Information disclosure in jsoncfg error handler",
+          "Description": "jsoncfg leaks internal object fields in verbose error responses, exposing stored records to an authenticated user. CVSS 5.3.",
+          "PrimaryURL": "https://example.test/CVE-2099-0002"
+        }
+      ]
+    }
+  ]
+}

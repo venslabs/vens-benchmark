@@ -1,0 +1,9 @@
+project:
+  name: svc
+  description: service
+context:
+  exposure: internet
+  data_sensitivity: critical
+  business_criticality: critical
+  notes: The vulnerable endpoint is internet-exposed and we have observed exploitation
+    attempts in our logs; the code path is reachable.

@@ -1,0 +1,11 @@
+project:
+  name: svc
+  description: service
+context:
+  exposure: internet
+  data_sensitivity: high
+  business_criticality: high
+  controls:
+    waf: true
+    ids: true
+  notes: A web application firewall and IDS are deployed at the edge.

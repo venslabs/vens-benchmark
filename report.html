@@ -1,0 +1,311 @@
+<title>Which LLM for CVE scoring? — vens benchmark</title>
+<style>
+  :root{
+    --paper:#F5F7F8; --panel:#FFFFFF; --ink:#121821; --muted:#5C6672;
+    --line:#DCE1E6; --line-soft:#EAEEF0;
+    --accent:#14596E; --accent-soft:#E4EEF1; --accent-deep:#0E4150;
+    --low:#2E7D5B; --low-bg:#E7F1EC; --med:#B0781E; --med-bg:#F6EEDD;
+    --crit:#B23A3A; --crit-bg:#F5E4E4;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --maxw:920px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0}
+  .wrap{background:var(--paper); color:var(--ink); font-family:var(--sans);
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  .col{max-width:var(--maxw); margin:0 auto; padding:0 24px}
+  .num{font-variant-numeric:tabular-nums}
+  .mono{font-family:var(--mono)}
+  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--accent); font-weight:600;}
+  h1,h2,h3{text-wrap:balance; margin:0; font-weight:680; letter-spacing:-.02em}
+  p{margin:0}
+  a{color:var(--accent-deep)}
+  .mast{border-bottom:1px solid var(--line); padding:64px 0 40px}
+  .mast h1{font-size:clamp(30px,5vw,46px); line-height:1.08; margin:14px 0 0}
+  .mast .thesis{font-size:clamp(17px,2.3vw,20px); color:var(--muted); margin-top:18px; max-width:60ch}
+  .stats{display:flex; flex-wrap:wrap; gap:14px; margin-top:34px}
+  .stat{flex:1 1 150px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px 18px;}
+  .stat .k{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+  .stat .v{font-size:26px; font-weight:680; margin-top:6px; letter-spacing:-.02em}
+  section{padding:52px 0; border-bottom:1px solid var(--line)}
+  .sec-h{display:flex; align-items:baseline; gap:14px; margin-bottom:8px}
+  .sec-h .idx{font-family:var(--mono); font-size:13px; color:var(--accent); font-weight:600}
+  h2{font-size:clamp(22px,3vw,28px)}
+  .lead{color:var(--muted); margin:14px 0 26px; max-width:66ch}
+  .recs{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px}
+  .rec{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; position:relative}
+  .rec .role{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+  .rec .pick{font-size:18px; font-weight:680; margin:8px 0 2px; letter-spacing:-.01em}
+  .rec .meta{font-family:var(--mono); font-size:13px; color:var(--accent-deep); margin-bottom:8px}
+  .rec .why{font-size:14px; color:var(--muted); line-height:1.5}
+  .rec.best{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
+  .rec.best::before{content:"Best value"; position:absolute; top:-9px; left:16px; background:var(--accent); color:#fff; font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; padding:2px 8px; border-radius:5px}
+  .chart-card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:20px 12px 8px}
+  #pareto{width:100%; height:auto; display:block}
+  .cap{font-size:13px; color:var(--muted); margin-top:12px; padding:0 8px}
+  .tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--panel)}
+  table{border-collapse:collapse; width:100%; font-size:14.5px; min-width:520px}
+  th,td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line-soft)}
+  thead th{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:600; background:#FBFCFD}
+  tbody tr:last-child td{border-bottom:none}
+  td.n,th.n{text-align:right; font-variant-numeric:tabular-nums; font-family:var(--mono)}
+  .model{font-weight:600}
+  .bar span{display:inline-block; height:8px; border-radius:4px; background:var(--accent); vertical-align:middle}
+  tr.ref td{color:var(--muted); font-style:italic; background:#FBFCFD}
+  .tier-tag{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; padding:2px 7px; border-radius:20px; white-space:nowrap; background:var(--accent-soft); color:var(--accent-deep)}
+  .pill{font-family:var(--mono); font-weight:600; font-size:12px; padding:2px 9px; border-radius:20px; white-space:nowrap}
+  .sev-low{background:var(--low-bg); color:var(--low)}
+  .sev-med{background:var(--med-bg); color:var(--med)}
+  .sev-crit{background:var(--crit-bg); color:var(--crit)}
+  .pass{color:var(--low); font-weight:700}
+  .fail{color:var(--crit); font-weight:700}
+  .shows{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .show{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:6px}
+  .show .cve{font-family:var(--mono); font-size:12.5px; color:var(--muted)}
+  .show .name{font-weight:680; font-size:17px; letter-spacing:-.01em}
+  .flip{display:flex; align-items:center; gap:14px; margin:14px 0 10px}
+  .flip .box{flex:1; text-align:center; padding:12px 8px; border-radius:10px; border:1px solid var(--line)}
+  .flip .box .lbl{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+  .flip .box .big{font-size:22px; font-weight:700; margin-top:4px}
+  .flip .arrow{font-size:22px; color:var(--accent); flex:0 0 auto}
+  .show .verdict{font-size:13.5px; color:var(--muted); line-height:1.5}
+  .show .models{font-family:var(--mono); font-size:12px; color:var(--ink); margin-top:6px; border-top:1px dashed var(--line); padding-top:10px}
+  .finds{display:flex; flex-direction:column; gap:14px}
+  .find{background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--crit); border-radius:10px; padding:16px 18px}
+  .find h3{font-size:16px; margin-bottom:6px}
+  .find p{font-size:14.5px; color:var(--muted); line-height:1.55}
+  .find.warn{border-left-color:var(--med)}
+  .find.note{border-left-color:var(--accent)}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .callout{background:var(--accent-soft); border:1px solid #CFE0E5; border-radius:12px; padding:18px 20px; font-size:15px; line-height:1.55}
+  .callout b{color:var(--accent-deep)}
+  footer{padding:40px 0 64px; color:var(--muted); font-size:13.5px; line-height:1.6}
+  footer .col > div{max-width:72ch}
+  code{font-family:var(--mono); font-size:.9em; background:#EDF1F2; padding:1px 5px; border-radius:4px}
+  @media (max-width:640px){ .shows,.two{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="col">
+      <div class="eyebrow">Benchmark · July 2026 · venslabs/vens-benchmark</div>
+      <h1>Which LLM should score your CVEs?</h1>
+      <p class="thesis">A measured answer for <b>vens</b> — the tool that turns a scanner report plus your project context into OWASP risk scores. Two things decide it: does the model <em>understand the CVE</em>, and does it <em>use your context</em>? We tested both — and kept ourselves honest about where the test itself is weak.</p>
+      <div class="stats">
+        <div class="stat"><div class="k">Models ranked</div><div class="v num">8</div></div>
+        <div class="stat"><div class="k">Real CVEs scored</div><div class="v num">200</div></div>
+        <div class="stat"><div class="k">Best value pick</div><div class="v">gpt-5.4-mini</div></div>
+        <div class="stat"><div class="k">Total API spend</div><div class="v num">$8.80</div></div>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="col">
+      <div class="sec-h"><span class="idx">01</span><h2>The short answer</h2></div>
+      <p class="lead">No single model wins everything, and the top of the table is a statistical tie. Pick by what you optimize for — cost, auditability, or coarse bulk triage.</p>
+      <div class="recs">
+        <div class="rec best">
+          <div class="role">Cost / quality</div>
+          <div class="pick">gpt-5.4-mini</div>
+          <div class="meta">MAD 0.84 · $0.48/200</div>
+          <div class="why">Top-tier CVE understanding at a fraction of the price, and it handles both context showcases. Caveat: the least stable model run-to-run (risk SD 3.4 on identical inputs).</div>
+        </div>
+        <div class="rec">
+          <div class="role">Auditable VEX</div>
+          <div class="pick">claude-sonnet-4-6</div>
+          <div class="meta">MAD 0.76 · SD 0.75</div>
+          <div class="why">Tied with the flagship on accuracy and the most reproducible of the paid models — what you want when the score has to be defensible.</div>
+        </div>
+        <div class="rec">
+          <div class="role">Bulk triage only</div>
+          <div class="pick">gemini-2.5-flash-lite</div>
+          <div class="meta">MAD 1.15 · $0.07/200</div>
+          <div class="why">Absurdly cheap and still clears 2024's GPT-4 — but it is the least context-sensitive model here: flat on the context ladders and it re-inflates an unreachable CVE. Coarse sorting, not final scoring.</div>
+        </div>
+        <div class="rec">
+          <div class="role">Don't overpay</div>
+          <div class="pick">gpt-5.5</div>
+          <div class="meta">MAD 0.75 · $4.12/200</div>
+          <div class="why">Inside the top-4 tie with sonnet-4-6 at more than twice the cost. The flagship premium buys nothing measurable here.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="sec-h"><span class="idx">02</span><h2>Half one — does it understand the CVE?</h2></div>
+      <p class="lead">Reusing the public <b>CTIBench / CTI-VSP</b> task: read a real CVE description, predict its CVSS v3.1 vector. Metric is <b>MAD</b> — mean absolute error against the NVD score over 200 CVEs, with the vector parsed by the <code>cvss</code> library so the model never does the arithmetic. Lower is better.</p>
+      <div class="chart-card">
+        <svg id="pareto" viewBox="0 0 660 430" role="img" aria-label="Cost versus accuracy scatter of 8 models"></svg>
+        <p class="cap">Up and to the left is better: lower error, lower cost. The connected points are the <b>Pareto frontier</b>. Dashed lines mark 2024 baselines and the “always predict 7.5” floor (1.57 on these 200 CVEs).</p>
+      </div>
+
+      <div class="tbl-wrap" style="margin-top:20px">
+        <table>
+          <thead><tr><th>Model</th><th class="n">MAD ↓</th><th style="width:30%">error</th><th class="n">$ / 200</th><th>Tier</th></tr></thead>
+          <tbody>
+            <tr><td class="model">gpt-5.5</td><td class="n">0.75</td><td class="bar"><span style="width:37%"></span></td><td class="n">4.12</td><td rowspan="4" style="vertical-align:middle"><span class="tier-tag">top — tie</span></td></tr>
+            <tr><td class="model">claude-sonnet-4-6</td><td class="n">0.76</td><td class="bar"><span style="width:38%"></span></td><td class="n">1.90</td></tr>
+            <tr><td class="model">gpt-5.4-mini</td><td class="n">0.84</td><td class="bar"><span style="width:42%"></span></td><td class="n">0.48</td></tr>
+            <tr><td class="model">gemini-2.5-pro</td><td class="n">0.88</td><td class="bar"><span style="width:44%"></span></td><td class="n">1.16</td></tr>
+            <tr><td class="model">gemini-2.5-flash-lite</td><td class="n">1.15</td><td class="bar"><span style="width:57%"></span></td><td class="n">0.07</td><td rowspan="4" style="vertical-align:middle"><span class="tier-tag" style="background:var(--low-bg);color:var(--low)">budget</span></td></tr>
+            <tr><td class="model">gemini-2.5-flash</td><td class="n">1.17</td><td class="bar"><span style="width:58%"></span></td><td class="n">0.34</td></tr>
+            <tr><td class="model">gpt-5.4-nano</td><td class="n">1.20</td><td class="bar"><span style="width:60%"></span></td><td class="n">0.21</td></tr>
+            <tr><td class="model">claude-haiku-4-5</td><td class="n">1.29</td><td class="bar"><span style="width:64%"></span></td><td class="n">0.52</td></tr>
+            <tr class="ref"><td>GPT-4 (2024 baseline)</td><td class="n">1.31</td><td class="bar"><span style="width:65%;background:var(--muted)"></span></td><td class="n">—</td><td></td></tr>
+            <tr class="ref"><td>“always predict 7.5” (no LLM)</td><td class="n">1.57</td><td class="bar"><span style="width:78%;background:var(--crit)"></span></td><td class="n">0.00</td><td>floor</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout" style="margin-top:20px">
+        <b>Read it as tiers, not a strict ranking.</b> The top-4 (0.75–0.88) sit inside one standard error — calling gpt-5.5 “first” over sonnet-4-6 (0.006 apart) is noise; so is flash-lite over flash. Every 2026 model clears 2024’s GPT-4 (1.31), though the cheap four still trail 2024’s <em>Gemini-1.5</em> (1.09), and 2024’s GPT-3.5 (1.57) only ties the dumb “always 7.5” floor. “It’s an LLM” is not the same as “it’s useful.”
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="sec-h"><span class="idx">03</span><h2>Half two — does it use your context?</h2></div>
+      <p class="lead">This is what vens is for, and no public dataset covers it. Two real CVEs run through the vens CLI, where the project context is meant to flip the CVSS verdict — in both directions.</p>
+      <div class="shows">
+        <div class="show">
+          <div class="cve">CVE-2021-44228 · Log4Shell</div>
+          <div class="name">A 10.0 that should end LOW</div>
+          <div class="flip">
+            <div class="box"><div class="lbl">CVSS base</div><div class="big"><span class="pill sev-crit">10.0</span></div></div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="box"><div class="lbl">vens verdict</div><div class="big"><span class="pill sev-low">Note</span></div></div>
+          </div>
+          <p class="verdict">Context: internal-only, low-value, no untrusted input logged. The capable models drop it to Note. <b>Honest read:</b> the dumb rule engine already scores this Low from the declared context — the real split is that flash-lite <em>re-inflates</em> it.</p>
+          <div class="models"><span class="pass">Note</span> mini 1.0 · sonnet 3.0 · pro 4.0 &nbsp;·&nbsp; <span class="fail">Critical</span> flash-lite 48.8 · baseline 10/Low</div>
+        </div>
+        <div class="show">
+          <div class="cve">CVE-2023-45857 · axios</div>
+          <div class="name">A 6.5 that should end HIGH</div>
+          <div class="flip">
+            <div class="box"><div class="lbl">CVSS base</div><div class="big"><span class="pill sev-med">6.5</span></div></div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="box"><div class="lbl">vens verdict</div><div class="big"><span class="pill sev-crit">Critical</span></div></div>
+          </div>
+          <p class="verdict">Context: internet-facing portal, the leaked token rides with <b>customer PII under GDPR</b>. Every model — and the baseline — escalates it. Escalation is the easy direction.</p>
+          <div class="models"><span class="pass">Critical</span> all four models (63.8–72.0) · baseline 58.5</div>
+        </div>
+      </div>
+      <p class="lead" style="margin-top:24px">Escalation everyone gets. The interesting failure is <b>re-inflation</b>: the weakest model takes a CVE that the declared context (and the dumb baseline) already says is low, and pushes it back to Critical on the CVE’s reputation — scoring worse than no model at all.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="sec-h"><span class="idx">04</span><h2>Where the LLM actually beats the rule engine</h2></div>
+      <p class="lead">vens’s prompt already encodes most scoring as arithmetic on your context, so we built that rule engine explicitly — a non-LLM null model — and asked where the LLM genuinely beats it. It has to be a case the rule <em>structurally cannot</em> reach: reading the CVE text.</p>
+      <div class="two">
+        <div class="callout" style="background:var(--low-bg);border-color:#CDE3D6">
+          <b>Clean wins — reading the CVE.</b> A pure-DoS CVE with critical data: the naive rule maxes impact via data-sensitivity; <b>4/4 models</b> read “availability only” and score it lower. Reachability stated in the operator’s notes: the rule is blind to free text; <b>3/4 models</b> move the score, flash-lite doesn’t. These are the discriminators a rule can’t fake.
+        </div>
+        <div class="callout" style="background:#FBFCFD;border-color:var(--line)">
+          <b>Not a clean win.</b> The “accountability” case looks like a win, but a smarter rule (<code>max</code> over all declared requirement fields) also raises it — so it tests instruction-following, not reading. And on the pure arithmetic axes (exposure, sensitivity, criticality, compliance) the LLM only matches the rule — as it should; a per-model Wilcoxon is non-significant for 3 of 4 there.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="sec-h"><span class="idx">05</span><h2>The honest part — where it (and the test) breaks</h2></div>
+      <p class="lead">A benchmark that only shows wins is marketing. Four things every vens user — and reviewer — should hear.</p>
+      <div class="finds">
+        <div class="find">
+          <h3>Cheap models re-inflate, they don’t de-escalate</h3>
+          <p><code>gemini-2.5-flash-lite</code> keeps an unreachable, low-value Log4Shell at Critical (48.8) — <em>worse than the dumb baseline’s</em> 10/Low. It is the least context-sensitive model here: flat on the sensitivity ladder, flat on the reachability notes. Below a capability line, the model scores the CVE’s reputation, not your system.</p>
+        </div>
+        <div class="find warn">
+          <h3>A wrong context YAML yields a wrong score — by design</h3>
+          <p>We labeled a real payment-auth-bypass as “internal / low-value.” The capable models trust you: sonnet 12, pro 16.5 — close to the rule baseline. That is <em>spec-correct</em> for vens: the context is the operator’s declared truth, garbage-in-garbage-out. It’s not silent, either — <code>gpt-5.4-mini</code> flags the contradiction in its written rationale while still following the numbers. The lesson is operational, not a model defect: your YAML is load-bearing.</p>
+        </div>
+        <div class="find note">
+          <h3>Accurate isn’t stable</h3>
+          <p><code>gpt-5.4-mini</code> is the value champion but the least consistent — risk SD 3.4 across three identical, temperature-0 runs (one cell swung 17→52). For a VEX you’ll attest and ship, reproducibility is a feature, and there <code>claude-sonnet-4-6</code> (SD 0.75) wins. Note: SD over n=3 is a coarse estimate, not a precise ranking.</p>
+        </div>
+        <div class="find note">
+          <h3>The context test is partly rigged in the LLM’s favor</h3>
+          <p>Construct-validity caveat we won’t hide: the discriminator answers are partly <em>stated in the CVE text</em> (“availability only”, “not reachable”) and the null baseline is built to ignore that text — so Half two partly measures “reads text the rule skips,” which is close to tautological. It’s a real capability, but modest. Non-telegraphed variants, more models, and n≥10 repeats are the next run. Also: the 0–81 scale saturates (a third of high-context cells pin near the ceiling), so “should rise” is only measurable in bands; and one Gemini family is n=1, not n=3, from a mid-run credit outage.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="col">
+      <div class="eyebrow" style="color:var(--muted)">Methodology, threats to validity &amp; attribution</div>
+      <div style="margin-top:12px">
+        <p><b>Design.</b> Two halves. Severity understanding reuses the public <b>CTIBench / CTI-VSP</b> task (MAD vs NVD CVSS, 200 CVEs). Context modulation — vens’s own contribution, unlabeled anywhere public — uses contrastive scenarios through the vens CLI: real CVEs for the two showcases (credibility), synthetic CVEs for the directional families (to isolate the context variable from memorized severity). No gold label exists for context-conditioned risk, so we report direction, consistency, and discrimination — never absolute accuracy.</p>
+        <p style="margin-top:10px"><b>Statistics, honestly.</b> Discriminator direction is reported by model (DoS 4/4, reachability 3/4, accountability 4/4 models); the pooled sign-test p is <em>not</em> used, because the CVE×model cells are correlated — real power comes from the pending 8-model run. The overall LLM-vs-baseline Wilcoxon is significant for 1 of 4 models (direction consistent). Threshold-sensitivity for reachability is invariant by construction (the rule never reads notes); the DoS discriminator does not survive one of the three threshold sets. Consistency SDs are n=3 sample standard deviations — qualitative.</p>
+        <p style="margin-top:10px"><b>Reproducibility limits.</b> Models are named by floating July-2026 aliases; resolved snapshots were not recorded, so the ranking is pinned to weights that may move. The CTI-VSP prompt sends the CVE description twice (constant across all models — internal ranking unaffected, but not directly comparable to CTIBench’s published GPT-4=1.31 / Gemini-1.5=1.09). Part-B ran on an unreleased <code>+dirty</code> vens build. Confidence intervals are computed only where per-CVE predictions were saved (the Gemini models); the top-4 “tie” rests on the ~0.08 standard error, not full CIs.</p>
+        <p style="margin-top:10px"><b>Attribution.</b> CTIBench — <span class="mono">github.com/xashru/cti-bench</span> (NeurIPS 2024), CC BY-NC-SA 4.0; data derived from NVD (public domain), not redistributed here.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  (function(){
+    var data=[
+      {m:"gpt-5.5",mad:0.75,cost:4.12,front:1},
+      {m:"sonnet-4-6",mad:0.76,cost:1.90,front:1},
+      {m:"gpt-5.4-mini",mad:0.84,cost:0.48,front:1,star:1},
+      {m:"gemini-2.5-pro",mad:0.88,cost:1.16},
+      {m:"flash-lite",mad:1.15,cost:0.07,front:1},
+      {m:"gemini-2.5-flash",mad:1.17,cost:0.34},
+      {m:"gpt-5.4-nano",mad:1.20,cost:0.21},
+      {m:"haiku-4-5",mad:1.29,cost:0.52}
+    ];
+    var refs=[{y:1.09,t:"Gemini-1.5 '24"},{y:1.31,t:"GPT-4 '24"},{y:1.573,t:"floor 1.57"}];
+    var W=660,H=430,L=58,R=150,T=24,B=52;
+    var x0=Math.log10(0.05),x1=Math.log10(6);
+    var y0=0.68,y1=1.66;
+    function px(c){return L+(Math.log10(c)-x0)/(x1-x0)*(W-L-R);}
+    function py(v){return T+(v-y0)/(y1-y0)*(H-T-B);}
+    var NS="http://www.w3.org/2000/svg";
+    var svg=document.getElementById("pareto");
+    function el(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+    function txt(x,y,s,cls,anchor){var t=el("text",{x:x,y:y,"text-anchor":anchor||"start"});t.setAttribute("class",cls||"");t.textContent=s;svg.appendChild(t);}
+    [0.8,1.0,1.2,1.4,1.6].forEach(function(v){
+      svg.appendChild(el("line",{x1:L,y1:py(v),x2:W-R,y2:py(v),stroke:"#EAEEF0","stroke-width":1}));
+      txt(L-10,py(v)+4,v.toFixed(1),"axl","end");
+    });
+    refs.forEach(function(r){
+      svg.appendChild(el("line",{x1:L,y1:py(r.y),x2:W-R,y2:py(r.y),stroke:"#C9B27A","stroke-width":1,"stroke-dasharray":"4 4"}));
+      txt(W-R+6,py(r.y)+4,r.t,"ref");
+    });
+    [0.1,0.5,1,5].forEach(function(c){
+      txt(px(c),H-B+22,"$"+c.toFixed(c<1?2:0),"axl","middle");
+      svg.appendChild(el("line",{x1:px(c),y1:H-B,x2:px(c),y2:H-B+6,stroke:"#B9C2C9","stroke-width":1}));
+    });
+    txt(L,H-8,"cost  $/200 CVEs  (log)","axt","start");
+    var yt=el("text",{x:16,y:T+8,transform:"rotate(-90 16 "+(T+8)+")"});yt.setAttribute("class","axt");yt.textContent="error  MAD  (lower = better)";svg.appendChild(yt);
+    var f=data.filter(function(d){return d.front;}).sort(function(a,b){return a.cost-b.cost;});
+    var dpath="M "+f.map(function(d){return px(d.cost)+" "+py(d.mad);}).join(" L ");
+    svg.appendChild(el("path",{d:dpath,fill:"none",stroke:"#14596E","stroke-width":1.5,opacity:.55}));
+    data.forEach(function(d){
+      var cx=px(d.cost),cy=py(d.mad);
+      svg.appendChild(el("circle",{cx:cx,cy:cy,r:d.star?7:5.5,fill:d.front?"#14596E":"#FFFFFF",stroke:"#14596E","stroke-width":2}));
+      if(d.star){svg.appendChild(el("circle",{cx:cx,cy:cy,r:12,fill:"none",stroke:"#14596E","stroke-width":1,opacity:.4}));}
+      var anchor=cx>W-R-90?"end":"start";
+      var dx=anchor==="end"?-11:11;
+      txt(cx+dx,cy+4,d.m,"lbl"+(d.star?" lblstar":""),anchor);
+    });
+    var s=el("style");s.textContent=
+      ".axl{font-family:var(--mono);font-size:11px;fill:#5C6672}"+
+      ".axt{font-family:var(--mono);font-size:10.5px;fill:#8A929C;letter-spacing:.06em;text-transform:uppercase}"+
+      ".ref{font-family:var(--mono);font-size:10px;fill:#9C864F}"+
+      ".lbl{font-family:var(--sans);font-size:12px;fill:#121821}"+
+      ".lblstar{font-weight:700;fill:#0E4150}";
+    svg.appendChild(s);
+  })();
+</script>

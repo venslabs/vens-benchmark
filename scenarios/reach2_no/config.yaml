@@ -1,0 +1,9 @@
+project:
+  name: svc
+  description: service
+context:
+  exposure: internet
+  data_sensitivity: critical
+  business_criticality: critical
+  notes: 'The deserialization call site is unreachable: the feature is disabled and
+    no untrusted input reaches it.'

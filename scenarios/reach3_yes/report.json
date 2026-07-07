@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0013",
+          "PkgName": "tmplengine",
+          "InstalledVersion": "2.5.0",
+          "Severity": "CRITICAL",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/tmplengine@2.5.0"
+          },
+          "Title": "Template-injection RCE in tmplengine",
+          "Description": "Server-side template injection in tmplengine lets a remote attacker run arbitrary code by submitting a crafted template expression. CVSS 9.8.",
+          "PrimaryURL": "https://example.test/CVE-2099-0013"
+        }
+      ]
+    }
+  ]
+}

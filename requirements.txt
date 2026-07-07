@@ -1,0 +1,8 @@
+# Python 3.12.12
+anthropic==0.116.0
+cvss==3.6
+google-genai==2.10.0
+numpy==2.5.0
+openai==2.44.0
+PyYAML==6.0.3
+scipy==1.18.0

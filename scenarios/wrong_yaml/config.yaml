@@ -1,0 +1,8 @@
+project:
+  name: mislabeled
+  description: context contradicts reality
+context:
+  exposure: internal
+  data_sensitivity: low
+  business_criticality: low
+  notes: Nothing sensitive here, just a test box.

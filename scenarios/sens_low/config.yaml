@@ -1,0 +1,7 @@
+project:
+  name: svc
+  description: service
+context:
+  exposure: internet
+  data_sensitivity: low
+  business_criticality: high

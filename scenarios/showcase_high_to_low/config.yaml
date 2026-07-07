@@ -1,0 +1,14 @@
+project:
+  name: internal-batch-tool
+  description: Internal-only batch report generator (Java)
+context:
+  exposure: internal
+  data_sensitivity: low
+  business_criticality: low
+  controls:
+    segmentation: true
+    ids: true
+  notes: Log4j is present but message-lookup substitution is disabled (log4j2.formatMsgNoLookups=true)
+    and no untrusted/user-controlled input is ever passed to the logger. Internal-only
+    tool with no outbound network to reach an attacker LDAP server; the RCE path is
+    not reachable.
