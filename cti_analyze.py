@@ -60,7 +60,7 @@ def main():
     models.sort(key=lambda m: m["mad"])
     front = set(pareto_front(models))
 
-    print("=== RANKING (MAD lower=better; floor=1.538; GPT-4'24=1.31) ===")
+    print("=== RANKING (MAD lower=better; floor=1.573; GPT-4'24=1.31) ===")
     print(f"{'model':22s} {'MAD':>6s} {'95% CI':>16s} {'bias':>7s} "
           f"{'$/200':>7s} {'pareto':>7s}")
     for m in models:

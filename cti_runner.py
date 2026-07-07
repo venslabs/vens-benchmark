@@ -156,7 +156,7 @@ def main():
     out = list(merged.values())
     with open(outpath, "w") as f:
         json.dump(out, f, indent=2)
-    print("\n=== SUMMARY (lower MAD = better; floor 'always 7.5' = 1.538) ===")
+    print("\n=== SUMMARY (lower MAD = better; floor 'always 7.5' = 1.573 on 200) ===")
     for r in sorted(out, key=lambda x: (x["mad"] is None, x["mad"] or 9)):
         print(f"  {r['model']:24s} MAD={r['mad']} parsed={r['parsed']}/{r['n']} "
               f"fails={r['parse_fail']} cost=${r['cost_usd']} {r['latency_s']}s")
