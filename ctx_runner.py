@@ -18,10 +18,19 @@ SERIAL = "urn:uuid:00000000-0000-0000-0000-000000000001"
 
 # name -> (llm backend, model env var, model id)
 MODELS = {
+    "gpt-5.4-nano":         ("openai", "OPENAI_MODEL", "gpt-5.4-nano"),
     "gpt-5.4-mini":         ("openai", "OPENAI_MODEL", "gpt-5.4-mini"),
+    "gpt-5.5":              ("openai", "OPENAI_MODEL", "gpt-5.5"),
+    "claude-haiku-4-5":     ("anthropic", "ANTHROPIC_MODEL", "claude-haiku-4-5"),
     "claude-sonnet-4-6":    ("anthropic", "ANTHROPIC_MODEL", "claude-sonnet-4-6"),
-    "gemini-2.5-pro":       ("googleai", "GOOGLE_MODEL", "gemini-2.5-pro"),
     "gemini-2.5-flash-lite":("googleai", "GOOGLE_MODEL", "gemini-2.5-flash-lite"),
+    "gemini-2.5-flash":     ("googleai", "GOOGLE_MODEL", "gemini-2.5-flash"),
+    "gemini-2.5-pro":       ("googleai", "GOOGLE_MODEL", "gemini-2.5-pro"),
+    # local (Ollama) via vens --llm ollama (reads OLLAMA_MODEL, OLLAMA_HOST) -- free
+    "llama3.2":             ("ollama", "OLLAMA_MODEL", "llama3.2"),
+    "qwen2.5:7b":           ("ollama", "OLLAMA_MODEL", "qwen2.5:7b"),
+    "gemma2:9b":            ("ollama", "OLLAMA_MODEL", "gemma2:9b"),
+    "deepseek-r1:8b":       ("ollama", "OLLAMA_MODEL", "deepseek-r1:8b"),
     "mock":                 ("mock", "OPENAI_MODEL", "mock"),
 }
 
@@ -95,6 +104,7 @@ def main():
     ap.add_argument("--models", default="mock")
     ap.add_argument("--repeats", type=int, default=1)
     ap.add_argument("--scenarios", default="all")
+    ap.add_argument("--workers", type=int, default=4)
     args = ap.parse_args()
     names = [m for m in MODELS if m != "mock"] if args.models == "all" \
         else args.models.split(",")
@@ -106,7 +116,7 @@ def main():
             for rp in range(args.repeats)]
     os.makedirs("results", exist_ok=True)
     results = []
-    with cf.ThreadPoolExecutor(max_workers=4) as ex:
+    with cf.ThreadPoolExecutor(max_workers=args.workers) as ex:
         futs = {ex.submit(run_one, s, m, rp): (s, m, rp) for s, m, rp in jobs}
         for fut in cf.as_completed(futs):
             res = fut.result()

@@ -148,5 +148,30 @@
     "cve": "CVE-2099-0007",
     "sev": "HIGH",
     "expect": "local bug, no controls: vulnerability baseline for the WAF test"
+  },
+  "disc_dos_nt": {
+    "cve": "CVE-2099-0020",
+    "sev": "HIGH",
+    "expect": "non-telegraphed DoS: technical should not max via data_sensitivity"
+  },
+  "disc_dos_nt2": {
+    "cve": "CVE-2099-0021",
+    "sev": "HIGH",
+    "expect": "non-telegraphed DoS: technical should not max via data_sensitivity"
+  },
+  "disc_audit_nt": {
+    "cve": "CVE-2099-0022",
+    "sev": "MEDIUM",
+    "expect": "non-telegraphed accountability: technical should track audit_requirement"
+  },
+  "disc_audit_nt2": {
+    "cve": "CVE-2099-0023",
+    "sev": "MEDIUM",
+    "expect": "non-telegraphed accountability: technical should track audit_requirement"
+  },
+  "disc_ctrl_irrelevant_nt": {
+    "cve": "CVE-2099-0024",
+    "sev": "HIGH",
+    "expect": "non-telegraphed local bug: WAF irrelevant, vulnerability should not drop"
   }
 }

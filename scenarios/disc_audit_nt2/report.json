@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0023",
+          "PkgName": "opstrace",
+          "InstalledVersion": "2.2.0",
+          "Severity": "MEDIUM",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/opstrace@2.2.0"
+          },
+          "Title": "Event handling flaw in opstrace",
+          "Description": "opstrace lets an authenticated user discard change-history entries before they reach durable storage, so a later review cannot reconstruct what was modified. No stored business data is read or changed. CVSS 5.3.",
+          "PrimaryURL": "https://example.test/CVE-2099-0023"
+        }
+      ]
+    }
+  ]
+}

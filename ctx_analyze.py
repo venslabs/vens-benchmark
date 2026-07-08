@@ -130,6 +130,35 @@ def main():
         irr = ctx.get(("disc_ctrl_irrelevant", m), {}).get("vulnerability", "?")
         print(f"    {m:22s} web-RCE+WAF {r_off}->{r_on} (should drop) | local-bug+WAF vuln={irr} (should NOT drop)")
 
+    print("\n=== TELEGRAPHED vs NON-TELEGRAPHED (construct validity) ===")
+    print("  same context; the nt CVE no longer names the impact class. A model that")
+    print("  reasons keeps its factor; one that keyword-matched drifts back toward naive.")
+
+    def famrows(factor, tel, nt):
+        for m in models:
+            tv = [ctx[(s, m)][factor] for s in tel if (s, m) in ctx]
+            nv = [ctx[(s, m)][factor] for s in nt if (s, m) in ctx]
+            tm = round(st.mean(tv), 1) if tv else "?"
+            nm = round(st.mean(nv), 1) if nv else "?"
+            drift = f"{nm - tm:+.1f}" if tv and nv else "?"
+            print(f"    {m:22s} telegraphed={tm:>4}  non-telegraphed={nm:>4}  drift={drift:>5}")
+
+    print("\n  DoS technical_impact (naive rule=9; a reading model scores LOWER and should")
+    print("       NOT drift back up once 'denial of service' is removed):")
+    famrows("technical_impact", ["disc_dos", "disc_dos2", "disc_dos3"],
+            ["disc_dos_nt", "disc_dos_nt2"])
+    print("\n  Accountability technical_impact (naive rule=2; a reading model scores HIGHER")
+    print("       via audit_requirement and should stay high without the word 'audit'):")
+    famrows("technical_impact", ["disc_audit", "disc_audit2", "disc_audit3"],
+            ["disc_audit_nt", "disc_audit_nt2"])
+    print("\n  Irrelevant WAF: vulnerability on the local bug. no-WAF is the SAME local bug")
+    print("       without controls; a WAF at the edge must not lower a local-file exploit:")
+    for m in models:
+        off = ctx.get(("disc_ctrl_off_local", m), {}).get("vulnerability", "?")
+        tel = ctx.get(("disc_ctrl_irrelevant", m), {}).get("vulnerability", "?")
+        nt = ctx.get(("disc_ctrl_irrelevant_nt", m), {}).get("vulnerability", "?")
+        print(f"    {m:22s} no-WAF={off}  WAF(telegraphed)={tel}  WAF(non-telegraphed)={nt}")
+
     print("\n=== LLM vs BASELINE (risk per scenario; divergence = LLM adds value) ===")
     scen = sorted({s for (s, _) in ctx})
     print(f"{'scenario':24s} {'baseline':>9s} " + " ".join(f"{m[:10]:>10s}" for m in models))

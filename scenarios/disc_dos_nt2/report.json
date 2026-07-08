@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0021",
+          "PkgName": "xmlflat",
+          "InstalledVersion": "2.0.0",
+          "Severity": "HIGH",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/xmlflat@2.0.0"
+          },
+          "Title": "Entity expansion in xmlflat",
+          "Description": "xmlflat expands nested entity references in incoming documents. A small crafted document expands to many gigabytes in memory and the parser process is killed before it returns a response. CVSS 7.5.",
+          "PrimaryURL": "https://example.test/CVE-2099-0021"
+        }
+      ]
+    }
+  ]
+}

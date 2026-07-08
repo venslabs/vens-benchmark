@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0024",
+          "PkgName": "cfgloader",
+          "InstalledVersion": "1.0.0",
+          "Severity": "HIGH",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/cfgloader@1.0.0"
+          },
+          "Title": "Unsafe load in cfgloader",
+          "Description": "cfgloader executes embedded directives when it reads a configuration file from the local filesystem during startup. An attacker able to write that file on the host runs code as the service account. CVSS 7.0.",
+          "PrimaryURL": "https://example.test/CVE-2099-0024"
+        }
+      ]
+    }
+  ]
+}

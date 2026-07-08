@@ -74,8 +74,9 @@ def main():
 
     print("=== 1. BASELINE THRESHOLD SENSITIVITY ===")
     print("   do the discriminator conclusions survive 3 different threshold sets?")
-    audit_ids = ["disc_audit","disc_audit2","disc_audit3"]
-    dos_ids = ["disc_dos","disc_dos2","disc_dos3"]
+    # n=5 per family: 3 telegraphed + 2 non-telegraphed CVEs (effect size, not a clean p)
+    audit_ids = ["disc_audit","disc_audit2","disc_audit3","disc_audit_nt","disc_audit_nt2"]
+    dos_ids = ["disc_dos","disc_dos2","disc_dos3","disc_dos_nt","disc_dos_nt2"]
     for vname,(L,E,S) in VARIANTS.items():
         base = {sid: baseline_score(c, r, L, E, S) for sid,(c,r) in scen.items()}
         audit_ok = all(llm.get((s,m),{}).get("technical",0) > base[s]["technical"]

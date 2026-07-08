@@ -94,6 +94,34 @@ CVES = {
                 title="Template-injection RCE in tmplengine",
                 desc="Server-side template injection in tmplengine lets a remote attacker run "
                      "arbitrary code by submitting a crafted template expression. CVSS 9.8."),
+    # ---- NON-TELEGRAPHED variants (construct validity): same mechanism as their
+    # telegraphed twins, but title + description no longer name the impact class or
+    # assert "no C/I impact" -- the model must INFER the factor, not keyword-match. ----
+    "dos_nt": dict(id="CVE-2099-0020", pkg="bufpool", ver="1.0.0", sev="HIGH",
+                title="Resource handling issue in bufpool",
+                desc="In bufpool, a request field sets the size of a preallocated buffer with no "
+                     "upper bound. A remote request carrying a large value drives memory use up "
+                     "until the operating system terminates the worker process. CVSS 7.5."),
+    "dos_nt2": dict(id="CVE-2099-0021", pkg="xmlflat", ver="2.0.0", sev="HIGH",
+                title="Entity expansion in xmlflat",
+                desc="xmlflat expands nested entity references in incoming documents. A small "
+                     "crafted document expands to many gigabytes in memory and the parser process "
+                     "is killed before it returns a response. CVSS 7.5."),
+    "audit_nt": dict(id="CVE-2099-0022", pkg="trailkeep", ver="1.3.0", sev="MEDIUM",
+                title="Record handling flaw in trailkeep",
+                desc="An authenticated user can send a request that alters or removes the server's "
+                     "stored record of who performed each administrative action. Current "
+                     "application data and service availability are unaffected. CVSS 5.4."),
+    "audit_nt2": dict(id="CVE-2099-0023", pkg="opstrace", ver="2.2.0", sev="MEDIUM",
+                title="Event handling flaw in opstrace",
+                desc="opstrace lets an authenticated user discard change-history entries before "
+                     "they reach durable storage, so a later review cannot reconstruct what was "
+                     "modified. No stored business data is read or changed. CVSS 5.3."),
+    "locallib_nt": dict(id="CVE-2099-0024", pkg="cfgloader", ver="1.0.0", sev="HIGH",
+                title="Unsafe load in cfgloader",
+                desc="cfgloader executes embedded directives when it reads a configuration file "
+                     "from the local filesystem during startup. An attacker able to write that "
+                     "file on the host runs code as the service account. CVSS 7.0."),
 }
 
 
@@ -287,6 +315,31 @@ SCENARIOS = {
     "disc_ctrl_off_local": ("locallib", cfg("svc", "service", exposure="internet",
                             data_sensitivity="high", business_criticality="high"),
                             "local bug, no controls: vulnerability baseline for the WAF test"),
+
+    # ---- NON-TELEGRAPHED discriminators: identical context to the telegraphed disc_*
+    # twin; only the CVE text changes (impact class no longer named). Pairing measures
+    # whether a right answer came from reasoning or from keyword-matching the CVE. ----
+    "disc_dos_nt": ("dos_nt", cfg("svc", "streaming service", exposure="internet",
+                    data_sensitivity="critical", business_criticality="high",
+                    availability_requirement="high"),
+                    "non-telegraphed DoS: technical should not max via data_sensitivity"),
+    "disc_dos_nt2": ("dos_nt2", cfg("svc", "api service", exposure="internet",
+                     data_sensitivity="critical", business_criticality="high",
+                     availability_requirement="high"),
+                     "non-telegraphed DoS: technical should not max via data_sensitivity"),
+    "disc_audit_nt": ("audit_nt", cfg("svc", "financial ledger", exposure="internet",
+                      data_sensitivity="low", business_criticality="high",
+                      audit_requirement="high"),
+                      "non-telegraphed accountability: technical should track audit_requirement"),
+    "disc_audit_nt2": ("audit_nt2", cfg("svc", "ledger service", exposure="internet",
+                       data_sensitivity="low", business_criticality="high",
+                       audit_requirement="high"),
+                       "non-telegraphed accountability: technical should track audit_requirement"),
+    "disc_ctrl_irrelevant_nt": ("locallib_nt", cfg("svc", "service", exposure="internet",
+                                data_sensitivity="high", business_criticality="high",
+                                controls={"waf": True, "ids": True},
+                                notes="A web application firewall and IDS are deployed at the edge."),
+                                "non-telegraphed local bug: WAF irrelevant, vulnerability should not drop"),
 }
 
 

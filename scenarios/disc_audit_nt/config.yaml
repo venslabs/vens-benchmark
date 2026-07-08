@@ -1,0 +1,8 @@
+project:
+  name: svc
+  description: financial ledger
+context:
+  exposure: internet
+  data_sensitivity: low
+  business_criticality: high
+  audit_requirement: high

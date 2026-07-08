@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "bench/app:latest",
+  "ArtifactType": "container_image",
+  "Results": [
+    {
+      "Target": "app",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2099-0020",
+          "PkgName": "bufpool",
+          "InstalledVersion": "1.0.0",
+          "Severity": "HIGH",
+          "PkgIdentifier": {
+            "PURL": "pkg:deb/debian/bufpool@1.0.0"
+          },
+          "Title": "Resource handling issue in bufpool",
+          "Description": "In bufpool, a request field sets the size of a preallocated buffer with no upper bound. A remote request carrying a large value drives memory use up until the operating system terminates the worker process. CVSS 7.5.",
+          "PrimaryURL": "https://example.test/CVE-2099-0020"
+        }
+      ]
+    }
+  ]
+}

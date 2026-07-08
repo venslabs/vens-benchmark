@@ -30,6 +30,11 @@ MODELS = {
     "gemini-2.5-flash-lite":("google", "gemini-2.5-flash-lite", False, (0.10, 0.40)),
     "gemini-2.5-flash":     ("google", "gemini-2.5-flash",      False, (0.30, 2.50)),
     "gemini-2.5-pro":       ("google", "gemini-2.5-pro",        False, (1.25, 10.0)),
+    # local (Ollama) -- free ($0); run explicitly, not via --models all + cloud
+    "llama3.2":             ("ollama", "llama3.2",       False, (0.0, 0.0)),
+    "qwen2.5:7b":           ("ollama", "qwen2.5:7b",     False, (0.0, 0.0)),
+    "gemma2:9b":            ("ollama", "gemma2:9b",      False, (0.0, 0.0)),
+    "deepseek-r1:8b":       ("ollama", "deepseek-r1:8b", False, (0.0, 0.0)),
 }
 
 VEC_RE = re.compile(r"CVSS:3\.[01]/[A-Z:/.]+")
@@ -87,6 +92,18 @@ def call_google(model, prompt):
     return (r.text or ""), (um.prompt_token_count, um.candidates_token_count or 0)
 
 
+def call_ollama(model, prompt):
+    """Local model via Ollama's OpenAI-compatible endpoint (free, no key)."""
+    from openai import OpenAI
+    cli = OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
+    r = cli.chat.completions.create(
+        model=model, temperature=0, max_tokens=4096,  # room for reasoning models
+        messages=[{"role": "user", "content": prompt}],
+    )
+    u = r.usage
+    return r.choices[0].message.content or "", (u.prompt_tokens or 0, u.completion_tokens or 0)
+
+
 def _one(provider, mid, effort, r):
     """Score one CVE with retries. Returns (pred, gt, tokens_in, tokens_out)."""
     prompt = f"{r['Prompt']}\n\nCVE description:\n{r['Description']}"
@@ -96,6 +113,8 @@ def _one(provider, mid, effort, r):
                 txt, (ci, co) = call_openai(mid, prompt, effort)
             elif provider == "anthropic":
                 txt, (ci, co) = call_anthropic(mid, prompt)
+            elif provider == "ollama":
+                txt, (ci, co) = call_ollama(mid, prompt)
             else:
                 txt, (ci, co) = call_google(mid, prompt)
             pred, _vec = extract_score(txt)
@@ -110,6 +129,8 @@ def _one(provider, mid, effort, r):
 def run_model(name, rows, effort, workers=6):
     from concurrent.futures import ThreadPoolExecutor
     provider, mid, _reason, (pin, pout) = MODELS[name]
+    if provider == "ollama":
+        workers = 2  # local GPU serializes; more workers just thrash memory
     t0 = time.time()
     with ThreadPoolExecutor(max_workers=workers) as ex:
         out = list(ex.map(lambda r: _one(provider, mid, effort, r), rows))
