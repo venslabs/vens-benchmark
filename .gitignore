@@ -22,3 +22,5 @@ __pycache__/
 # compiled vens binary (rebuild from the vens repo) and downloaded reference papers
 vens
 *.pdf
+# ...but ship our paper's readable PDF (the .tex source is tracked too)
+!paper/vens-benchmark.pdf

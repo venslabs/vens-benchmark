@@ -2,6 +2,8 @@
 
 Which LLM should you run [vens](https://github.com/venslabs/vens) with? This benchmarks models on the job vens actually does: scoring a CVE's risk from a scanner report plus project context.
 
+**Paper:** [Which LLM Should Score Your CVEs?](paper/vens-benchmark.pdf) — methodology, all 12 models, and where it fails.
+
 ## Which model to pick
 
 200 CVEs, CTIBench CVSS task, July 2026. MAD = mean absolute error vs the NVD base score (lower is better).
