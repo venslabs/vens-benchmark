@@ -95,10 +95,10 @@
       <h1>Which LLM should score your CVEs?</h1>
       <p class="thesis">A measured answer for <b>vens</b> — the tool that turns a scanner report plus your project context into OWASP risk scores. Two things decide it: does the model <em>understand the CVE</em>, and does it <em>use your context</em>? We tested both — and kept ourselves honest about where the test itself is weak.</p>
       <div class="stats">
-        <div class="stat"><div class="k">Models ranked</div><div class="v num">8</div></div>
+        <div class="stat"><div class="k">Models ranked</div><div class="v num">12</div></div>
         <div class="stat"><div class="k">Real CVEs scored</div><div class="v num">200</div></div>
         <div class="stat"><div class="k">Best value pick</div><div class="v">gpt-5.4-mini</div></div>
-        <div class="stat"><div class="k">Total API spend</div><div class="v num">$8.80</div></div>
+        <div class="stat"><div class="k">Total API spend</div><div class="v num">$17</div></div>
       </div>
     </div>
   </header>
@@ -112,13 +112,13 @@
           <div class="role">Cost / quality</div>
           <div class="pick">gpt-5.4-mini</div>
           <div class="meta">MAD 0.84 · $0.48/200</div>
-          <div class="why">Top-tier CVE understanding at a fraction of the price, and it handles both context showcases. Caveat: the least stable model run-to-run (risk SD 3.4 on identical inputs).</div>
+          <div class="why">Top-tier CVE understanding at a fraction of the price, and it handles both context showcases. Caveat: among the least stable run-to-run (risk SD 3.2 on identical inputs).</div>
         </div>
         <div class="rec">
           <div class="role">Auditable VEX</div>
           <div class="pick">claude-sonnet-4-6</div>
-          <div class="meta">MAD 0.76 · SD 0.75</div>
-          <div class="why">Tied with the flagship on accuracy and the most reproducible of the paid models — what you want when the score has to be defensible.</div>
+          <div class="meta">MAD 0.75 · SD 0.85</div>
+          <div class="why">Best accuracy on the board and the most reproducible of the accurate models — what you want when the score has to be defensible.</div>
         </div>
         <div class="rec">
           <div class="role">Bulk triage only</div>
@@ -165,6 +165,9 @@
       <div class="callout" style="margin-top:20px">
         <b>Read it as tiers, not a strict ranking.</b> The top-4 (0.75–0.88) sit inside one standard error — calling gpt-5.5 “first” over sonnet-4-6 (0.006 apart) is noise; so is flash-lite over flash. Every 2026 model clears 2024’s GPT-4 (1.31), though the cheap four still trail 2024’s <em>Gemini-1.5</em> (1.09), and 2024’s GPT-3.5 (1.57) only ties the dumb “always 7.5” floor. “It’s an LLM” is not the same as “it’s useful.”
       </div>
+      <div class="callout" style="margin-top:14px;background:#FBFCFD;border-color:var(--line)">
+        <b>Local models (free, via Ollama) aren’t there yet.</b> deepseek-r1:8b 1.48, qwen2.5:7b 1.54, gemma2:9b 1.64, llama3.2 1.69 — all four land at or above the 1.57 “always 7.5” floor, and their confidence intervals overlap it: on this task they’re statistically indistinguishable from a constant guess, and they over-rate every CVE. On context they’re worse — only the reasoning model (deepseek) uses it at all, and jitterily; the others pin to “critical” regardless.
+      </div>
     </div>
   </section>
 
@@ -182,7 +185,7 @@
             <div class="box"><div class="lbl">vens verdict</div><div class="big"><span class="pill sev-low">Note</span></div></div>
           </div>
           <p class="verdict">Context: internal-only, low-value, no untrusted input logged. The capable models drop it to Note. <b>Honest read:</b> the dumb rule engine already scores this Low from the declared context — the real split is that flash-lite <em>re-inflates</em> it.</p>
-          <div class="models"><span class="pass">Note</span> mini 1.0 · sonnet 3.0 · pro 4.0 &nbsp;·&nbsp; <span class="fail">Critical</span> flash-lite 48.8 · baseline 10/Low</div>
+          <div class="models"><span class="pass">7/8 → Note/Low</span> (sonnet 3, gpt-5.5 5, mini 1, pro 4, flash 1, nano 5, haiku 4.5) &nbsp;·&nbsp; <span class="fail">flash-lite 48.8</span> · baseline 10/Low</div>
         </div>
         <div class="show">
           <div class="cve">CVE-2023-45857 · axios</div>
@@ -193,7 +196,7 @@
             <div class="box"><div class="lbl">vens verdict</div><div class="big"><span class="pill sev-crit">Critical</span></div></div>
           </div>
           <p class="verdict">Context: internet-facing portal, the leaked token rides with <b>customer PII under GDPR</b>. Every model — and the baseline — escalates it. Escalation is the easy direction.</p>
-          <div class="models"><span class="pass">Critical</span> all four models (63.8–72.0) · baseline 58.5</div>
+          <div class="models"><span class="pass">Critical</span> all 8 models (63.8–72.0) · baseline 58.5</div>
         </div>
       </div>
       <p class="lead" style="margin-top:24px">Escalation everyone gets. The interesting failure is <b>re-inflation</b>: the weakest model takes a CVE that the declared context (and the dumb baseline) already says is low, and pushes it back to Critical on the CVE’s reputation — scoring worse than no model at all.</p>
@@ -206,10 +209,10 @@
       <p class="lead">vens’s prompt already encodes most scoring as arithmetic on your context, so we built that rule engine explicitly — a non-LLM null model — and asked where the LLM genuinely beats it. It has to be a case the rule <em>structurally cannot</em> reach: reading the CVE text.</p>
       <div class="two">
         <div class="callout" style="background:var(--low-bg);border-color:#CDE3D6">
-          <b>Clean wins — reading the CVE.</b> A pure-DoS CVE with critical data: the naive rule maxes impact via data-sensitivity; <b>4/4 models</b> read “availability only” and score it lower. Reachability stated in the operator’s notes: the rule is blind to free text; <b>3/4 models</b> move the score, flash-lite doesn’t. These are the discriminators a rule can’t fake.
+          <b>Clean wins — reading the CVE.</b> <b>Reachability</b> stated only in the operator’s notes: the rule is blind to free text; <b>6/8 models</b> move the score sharply (one drops an unreachable RCE from 81 to 9), while flash-lite and nano ignore the notes entirely. <b>Accountability</b> under low data sensitivity: the rule scores technical=2, but <b>8/8</b> raise it to 8–9 — and it <em>survives de-telegraphing</em> (see below), so it’s genuine reading, not a keyword.
         </div>
         <div class="callout" style="background:#FBFCFD;border-color:var(--line)">
-          <b>Not a clean win.</b> The “accountability” case looks like a win, but a smarter rule (<code>max</code> over all declared requirement fields) also raises it — so it tests instruction-following, not reading. And on the pure arithmetic axes (exposure, sensitivity, criticality, compliance) the LLM only matches the rule — as it should; a per-model Wilcoxon is non-significant for 3 of 4 there.
+          <b>The one that isn’t.</b> The pure-<b>DoS</b> case looks like a win — models do score technical below the naive max — but the effect is small (~8 vs 9) and <em>collapses</em> when we strip the phrase “denial of service”: it was mostly keyword-matching, not real understanding of availability-only impact. On the arithmetic axes (exposure, sensitivity, criticality, compliance) the LLM only matches the rule, as it should; a per-model Wilcoxon is significant for only 3 of 8.
         </div>
       </div>
     </div>
@@ -230,11 +233,11 @@
         </div>
         <div class="find note">
           <h3>Accurate isn’t stable</h3>
-          <p><code>gpt-5.4-mini</code> is the value champion but the least consistent — risk SD 3.4 across three identical, temperature-0 runs (one cell swung 17→52). For a VEX you’ll attest and ship, reproducibility is a feature, and there <code>claude-sonnet-4-6</code> (SD 0.75) wins. Note: SD over n=3 is a coarse estimate, not a precise ranking.</p>
+          <p><code>gpt-5.4-mini</code> is the value champion but one of the least consistent — risk SD 3.2 across three identical, temperature-0 runs; <code>gpt-5.4-nano</code> is worse (3.7). For a VEX you’ll attest and ship, reproducibility is a feature, and there <code>claude-sonnet-4-6</code> (SD 0.85) and the deterministic Gemini models win. Note: SD over n=3 is a coarse estimate, not a precise ranking.</p>
         </div>
         <div class="find note">
-          <h3>The context test is partly rigged in the LLM’s favor</h3>
-          <p>Construct-validity caveat we won’t hide: the discriminator answers are partly <em>stated in the CVE text</em> (“availability only”, “not reachable”) and the null baseline is built to ignore that text — so Half two partly measures “reads text the rule skips,” which is close to tautological. It’s a real capability, but modest. Non-telegraphed variants, more models, and n≥10 repeats are the next run. Also: the 0–81 scale saturates (a third of high-context cells pin near the ceiling), so “should rise” is only measurable in bands; and one Gemini family is n=1, not n=3, from a mid-run credit outage.</p>
+          <h3>We de-rigged the context test — and one discriminator failed it</h3>
+          <p>The obvious objection: the discriminator answers are partly <em>stated in the CVE text</em> (“availability only”), so a model could keyword-match instead of reason. We built <em>non-telegraphed twins</em> — same context, but the CVE no longer names the impact class — and re-ran. <b>Accountability holds</b> (technical stays 8–9 without the word “audit”): real reading. <b>DoS collapses</b> (technical drifts back toward the naive max): mostly keyword-matching. So Half two now separates genuine context-reading from pattern-matching instead of assuming it. Remaining caveat: the 0–81 scale saturates, so “should rise” is measured in bands, not points.</p>
         </div>
       </div>
     </div>
@@ -245,8 +248,8 @@
       <div class="eyebrow" style="color:var(--muted)">Methodology, threats to validity &amp; attribution</div>
       <div style="margin-top:12px">
         <p><b>Design.</b> Two halves. Severity understanding reuses the public <b>CTIBench / CTI-VSP</b> task (MAD vs NVD CVSS, 200 CVEs). Context modulation — vens’s own contribution, unlabeled anywhere public — uses contrastive scenarios through the vens CLI: real CVEs for the two showcases (credibility), synthetic CVEs for the directional families (to isolate the context variable from memorized severity). No gold label exists for context-conditioned risk, so we report direction, consistency, and discrimination — never absolute accuracy.</p>
-        <p style="margin-top:10px"><b>Statistics, honestly.</b> Discriminator direction is reported by model (DoS 4/4, reachability 3/4, accountability 4/4 models); the pooled sign-test p is <em>not</em> used, because the CVE×model cells are correlated — real power comes from the pending 8-model run. The overall LLM-vs-baseline Wilcoxon is significant for 1 of 4 models (direction consistent). Threshold-sensitivity for reachability is invariant by construction (the rule never reads notes); the DoS discriminator does not survive one of the three threshold sets. Consistency SDs are n=3 sample standard deviations — qualitative.</p>
-        <p style="margin-top:10px"><b>Reproducibility limits.</b> Models are named by floating July-2026 aliases; resolved snapshots were not recorded, so the ranking is pinned to weights that may move. The CTI-VSP prompt sends the CVE description twice (constant across all models — internal ranking unaffected, but not directly comparable to CTIBench’s published GPT-4=1.31 / Gemini-1.5=1.09). Part-B ran on an unreleased <code>+dirty</code> vens build. Confidence intervals are computed only where per-CVE predictions were saved (the Gemini models); the top-4 “tie” rests on the ~0.08 standard error, not full CIs.</p>
+        <p style="margin-top:10px"><b>Statistics, honestly.</b> Discriminator direction is reported by model over 8 models: accountability 8/8, DoS 7/8, reachability 6/8 (binomial p = .004 / .035 / .14). We report per-model counts, not a pooled sign-test p, because the CVE×model cells are correlated. The overall LLM-vs-baseline Wilcoxon is significant for 3 of 8 models (flash, pro, mini); flash-lite and nano diverge from the rule engine by a median of zero — no measurable value added. Threshold-sensitivity: the accountability conclusion survives all three threshold sets, the DoS one does not. Consistency SDs are n=3 sample standard deviations — qualitative.</p>
+        <p style="margin-top:10px"><b>Reproducibility limits.</b> Models are named by floating July-2026 aliases; resolved snapshots were not recorded, so the ranking is pinned to weights that may move. The CTI-VSP prompt sends the CVE description twice (constant across all models — internal ranking unaffected, but not directly comparable to CTIBench’s published GPT-4=1.31 / Gemini-1.5=1.09). Part-B ran on an unreleased <code>+dirty</code> vens build. Confidence intervals are bootstrap over the 200 CVEs, computed where per-CVE predictions were saved (sonnet, mini, the three Gemini models, and the four local models); the top-4 “tie” rests on their overlapping intervals.</p>
         <p style="margin-top:10px"><b>Attribution.</b> CTIBench — <span class="mono">github.com/xashru/cti-bench</span> (NeurIPS 2024), CC BY-NC-SA 4.0; data derived from NVD (public domain), not redistributed here.</p>
       </div>
     </div>
