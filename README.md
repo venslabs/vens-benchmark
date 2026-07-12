@@ -12,7 +12,7 @@ Which LLM should you run [vens](https://github.com/venslabs/vens) with? This ben
 |---|---|---|---|
 | claude-sonnet-4-6 | 0.75 | $1.88 | most accurate, stable — default for signed VEX |
 | gpt-5.5 | 0.75 | $4.12 | same accuracy as sonnet, 2× the price — skip |
-| gpt-5.4-mini | 0.84 | $0.49 | best value; jittery, run n≥3 |
+| gpt-5.4-mini | 0.84 | $0.48 | best value; jittery, run n≥3 |
 | gemini-2.5-pro | 0.88 | $1.16 | solid middle |
 | gemini-2.5-flash-lite | 1.15 | $0.07 | cheapest; over-rates and adds little on context |
 | claude-haiku-4-5 | 1.29 | $0.52 | below the value line |
