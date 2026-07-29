@@ -21,22 +21,22 @@
 
 \begin{abstract}
 \noindent
-A scanner hands you 400 CVEs and their CVSS base scores. Most of them do not
-matter for \emph{your} deployment, and CVSS was never meant to tell you which.
-\code{vens} closes that gap by asking an LLM to re-score each finding against a
-short project-context file (exposure, data sensitivity, criticality, controls,
-compliance) and the scanner report, producing an OWASP Risk Rating from 0--81.
-The obvious question from operators is: \emph{which model do I put behind it, and
-is it worth the API bill?} We benchmark eight 2026 cloud models and four local
-models on the two things \code{vens} actually needs---reading a CVE and using the
-context---and compare every one against a non-LLM rule engine it has to beat.
-The headline: accuracy is a solved, cheap problem (a \$0.48 model ties a \$4.12
-one), context use is real but uneven (reachability and accountability move
-correctly; a denial-of-service cue is mostly keyword-matched), and the weakest
-models---including every local one we tried---are statistically
-indistinguishable from a constant guess. We give a concrete model-selection
-table and release the harness so a practitioner can rank any new model in an
-afternoon.
+Vulnerability scanners report hundreds of CVEs ranked by CVSS, but CVSS scores
+the flaw, not the system it sits in: the same finding can be urgent on an
+internet-facing service and irrelevant in an air-gapped batch job. \code{vens}
+re-scores each finding against a short project-context file (exposure, data
+sensitivity, criticality, controls, compliance) with an LLM, producing an OWASP
+Risk Rating from 0 to 81. For operators this raises a practical question: which
+model belongs behind it, and is the API cost worth it? We benchmark eight 2026
+cloud models and four local models on the two skills the task composes, reading
+a CVE and using the declared context, each against a non-LLM rule engine it has
+to beat. Three results stand out. Accuracy is cheap and effectively solved: a
+\$0.48 model matches a \$4.12 one. Context use is real but uneven: exposure and
+accountability move the score correctly, while a denial-of-service cue is
+largely keyword-matched rather than reasoned. And the weakest models, including
+every local model we tested, are statistically indistinguishable from a constant
+baseline. We give a concrete model-selection table and release the harness, so
+any new model can be ranked in an afternoon.
 \end{abstract}
 
 \section{Introduction}
@@ -79,7 +79,7 @@ likelihood by impact:
 Three of the four factors are close to arithmetic on the context file:
 \emph{ThreatAgent} tracks the exposure band, \emph{Technical} tracks
 data sensitivity, \emph{Business} tracks criticality plus a compliance bump. Only
-\emph{Vulnerability}---how exploitable this CVE is in this deployment---needs the
+\emph{Vulnerability}, how exploitable this CVE is in this deployment, needs the
 model to read and reason. This is exactly why a non-LLM baseline is not a
 strawman (\S\ref{sec:design}): most of the score can be produced by a lookup
 table, so the model has to earn its cost on the parts that cannot.
@@ -111,7 +111,7 @@ CLI with attestation on so we capture the four factors and the reasoning. Most
 scenarios are \emph{contrastive}: hold everything fixed, vary one context axis,
 and check the score moves the right way (exposure ladder, sensitivity ladder,
 controls on/off, reachability declared in operator notes). Two are real showcase
-CVEs. Five are \emph{discriminators}---cases where the naive lookup rule is
+CVEs. Five are \emph{discriminators}, cases where the naive lookup rule is
 wrong, so a model only gets them right by reading the CVE: a pure
 denial-of-service against a critical-data service (availability, not
 confidentiality), an accountability bug under low data sensitivity, and an
@@ -128,7 +128,7 @@ value, it was pattern-matching.
 \paragraph{The baseline it must beat.} A non-LLM rule engine reproduces
 \code{vens}'s own prompt arithmetic (Technical=sensitivity, Business=criticality
 $+$compliance, ThreatAgent=exposure band) and \emph{copies the vendor severity}
-for the Vulnerability factor---because a rule engine cannot judge exploitability.
+for the Vulnerability factor, because a rule engine cannot judge exploitability.
 This is a null model, not an oracle: divergence from it is exactly where the LLM
 adds value. We also report a constant ``always 7.5'' predictor as an accuracy
 floor.
@@ -146,10 +146,10 @@ CVEs where per-CVE predictions were saved.
 \subsection{RQ1 --- reading a CVE is a solved, cheap problem}
 Table~\ref{tab:mad} ranks all twelve models. The four strongest cloud models
 (\code{sonnet}, \code{gpt-5.5}, \code{gpt-5.4-mini}, \code{gemini-2.5-pro}) sit
-within overlapping confidence intervals---this is a \emph{tier}, not a ranking.
+within overlapping confidence intervals: this is a \emph{tier}, not a ranking.
 Two facts matter for operators. First, \code{gpt-5.4-mini} (\$0.48/200) ties
 \code{gpt-5.5} (\$4.12/200): on the Pareto front of accuracy $\times$ cost,
-\textbf{\code{gpt-5.5} is dominated}---\code{sonnet} is both more accurate and
+\textbf{\code{gpt-5.5} is dominated}, since \code{sonnet} is both more accurate and
 cheaper. Second, every 2026 model beats 2024's GPT-4 (MAD 1.31), but the cheap
 tier still trails 2024's Gemini-1.5 (1.09); progress is real but not uniform.
 Accurate models slightly under-rate (bias $-0.15$); the cheap Gemini models
@@ -190,7 +190,7 @@ On the two showcases the good models do the hard thing. A Log4Shell finding
 context drops to LOW on 7 of 8 cloud models; a medium axios token leak
 (CVE-2023-45857) on an internet PII portal under GDPR rises to HIGH on all 8.
 The one failure is telling: \code{gemini-2.5-flash-lite} \emph{re-inflates}
-Log4Shell to 48.8/Critical---worse than the rule baseline, which de-escalates it
+Log4Shell to 48.8/Critical, worse than the rule baseline, which de-escalates it
 correctly to LOW. Cheapness has a price.
 
 The contrastive ladders (exposure, sensitivity, criticality, compliance) are
@@ -201,8 +201,8 @@ and unreachable identically); \emph{accountability} lifts the Technical factor o
 8/8; the \emph{irrelevant WAF} is correctly \emph{not} credited against a
 local-only exploit by all. Per-model, a Wilcoxon test of (LLM $-$ baseline) risk
 is significant for \code{gemini-2.5-flash}, \code{-pro}, and \code{gpt-5.4-mini};
-crucially, \code{flash-lite} and \code{nano} have a median divergence of
-\emph{zero}---on context, they add nothing over the lookup table.
+\code{flash-lite} and \code{nano} have a median divergence of
+\emph{zero}: on context, they add nothing over the lookup table.
 
 \subsection{RQ3 --- some ``context use'' is keyword-matching}
 Table~\ref{tab:ct} is the honest part. When we strip the giveaway phrase, the
@@ -241,7 +241,7 @@ standard deviation of the risk over three repeats; it is a reliability floor, no
 a quality measure (a model can be reproducibly wrong), but for auditable VEX you
 want it low. \code{claude-sonnet-4-6} is the default: best accuracy, second-most
 stable (SD 0.85), on the Pareto front. \code{gpt-5.4-mini} is the value pick but
-jittery (SD 3.19)---run $n\ge3$ and take the median. \code{gemini-2.5-flash-lite}
+jittery (SD 3.19), so run $n\ge3$ and take the median. \code{gemini-2.5-flash-lite}
 is the throwaway-triage option at \$0.07/200, with the caveat that it re-inflates
 the hard case and adds little on context. \code{gpt-5.5} and \code{gpt-5.4-nano}
 have no niche: one is dominated, the other is jittery \emph{and} adds nothing.
@@ -269,9 +269,9 @@ $+0.8$ to $+1.4$. On context they are worse than the numbers suggest. The three
 non-reasoning models are extremely stable (SD 0--0.15), but by rigidity, not
 skill: \code{llama3.2} keeps Log4Shell at Critical regardless of context and
 returns an identical maxed score across the whole exposure ladder. Only the
-reasoning model, \code{deepseek-r1:8b}, actually engages the context---it is the
+reasoning model, \code{deepseek-r1:8b}, actually engages the context: it is the
 one local model that de-escalates the showcase (7.5/LOW) and reads
-reachability---but it is jittery (SD 2.25) and still poor on Half A. For
+reachability, but it is jittery (SD 2.25) and still poor on Half A. For
 context-conditioned scoring today, ``run a small local model'' is close to ``do
 not use an LLM.''
 
@@ -279,7 +279,7 @@ not use an LLM.''
 The split result is the useful one. Picking a model for CVE \emph{accuracy} is
 nearly free: the cheap tier is good enough and the expensive tier buys nothing,
 so spend the budget elsewhere. Picking a model for \emph{context} is where the
-money goes---and where the cheap models quietly fail, not by erroring but by
+money goes, and where the cheap models quietly fail, not by erroring but by
 collapsing onto the lookup table. An operator who benchmarks only accuracy (the
 easy, public number) will over-value \code{flash-lite} and \code{nano} and get a
 tool that ignores the very context that justified using an LLM. The two-half
@@ -303,7 +303,7 @@ arithmetic,'' not ``beats a strawman.'' \textbf{Data.} CTIBench is CC BY-NC-SA
 
 \section{Conclusion}
 For \code{vens}, and for context-aware CVE scoring generally: buy accuracy cheap,
-pay for context, and measure context directly---because the models that look
+pay for context, and measure context directly, because the models that look
 fine on the public accuracy number are the ones that ignore your config. Use
 \code{claude-sonnet-4-6} if you sign the output, \code{gpt-5.4-mini} if you do
 not, and skip the flagship. The harness, scenarios, and a one-line hook to
