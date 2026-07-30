@@ -87,7 +87,10 @@ table, so the model has to earn its cost on the parts that cannot.
 \section{Related work}
 CTIBench~\cite{ctibench} is a CTI benchmark suite whose CTI-VSP task asks a model
 to produce a CVSS v3.1 vector from a CVE description; we reuse it directly for
-RQ1 so our accuracy numbers sit next to its published baselines. Databricks'
+RQ1 so our accuracy numbers sit next to its published baselines. Marchiori et
+al.~\cite{marchiori} study the same reading skill in isolation, asking whether an
+LLM can compute a CVSS vector from CVE text and finding embedding models
+competitive on the more subjective impact metrics. Databricks'
 VulnWatch~\cite{vulnwatch} prioritizes CVEs with an LLM but scores the
 vulnerability in isolation; EPSS~\cite{epss} predicts exploitation probability
 from global signals, again context-free. Reachability tools
@@ -317,6 +320,9 @@ Intelligence. NeurIPS 2024. \url{https://github.com/xashru/cti-bench}
 Vulnerabilities. 2024.
 \bibitem{epss} J. Jacobs et al. Exploit Prediction Scoring System (EPSS). FIRST.
 \url{https://www.first.org/epss/}
+\bibitem{marchiori} F. Marchiori, D. Donadel, and M. Conti. Can LLMs Classify
+CVEs? Investigating LLMs Capabilities in Computing CVSS Vectors.
+TrustAICyberSec 2025. \url{https://arxiv.org/abs/2504.10713}
 \end{thebibliography}
 
 \end{document}
