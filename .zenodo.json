@@ -1,0 +1,24 @@
+{
+  "title": "Which LLM Should Score Your CVEs? A benchmark for context-aware CVE risk scoring",
+  "description": "Benchmark and paper evaluating large language models for context-aware CVE risk scoring, built for the vens project. Covers a CTIBench-derived CVE-severity track and a deployment-context track, measured against a non-LLM baseline.",
+  "upload_type": "software",
+  "license": "Apache-2.0",
+  "creators": [
+    { "name": "Dorgaa, Fahed", "affiliation": "venslabs" }
+  ],
+  "keywords": [
+    "CVE",
+    "vulnerability prioritization",
+    "context-aware scoring",
+    "large language models",
+    "benchmark",
+    "OWASP Risk Rating",
+    "CycloneDX",
+    "software supply chain security",
+    "CTIBench"
+  ],
+  "related_identifiers": [
+    { "identifier": "https://github.com/venslabs/vens-benchmark", "relation": "isSupplementTo", "scheme": "url" },
+    { "identifier": "https://github.com/venslabs/vens", "relation": "isSupplementTo", "scheme": "url" }
+  ]
+}
